@@ -1,0 +1,15 @@
+[package]
+name = "hex_showcase"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+iced_data_navigator.workspace = true
+
+iced.workspace = true
+iced.features = ["debug", "tokio", "fira-sans"]
+iced_core.workspace = true
+
+rand = "0.9"
+
+rfd = "0.16"

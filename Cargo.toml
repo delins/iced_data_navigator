@@ -1,0 +1,50 @@
+[package]
+name = "iced_data_navigator"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+categories.workspace = true
+keywords.workspace = true
+
+[dependencies]
+iced_core.workspace = true
+iced_widget.workspace = true
+
+encoding_rs.workspace = true
+bitflags = "2.10.0"
+
+[workspace]
+members = [
+    "examples/*"
+]
+
+[workspace.package]
+version = "0.1.0"
+authors = ["delins"]
+edition = "2024"
+license = "MIT"
+repository = ""
+categories = ["gui"]
+keywords = ["iced", "hex", "data", "virtual", "scrolling"]
+rust-version = "1.88"
+
+[workspace.dependencies]
+iced_data_navigator = { path = "." }
+
+iced = "0.14.0-dev"
+iced_core = "0.14.0-dev"
+iced_widget = "0.14.0-dev"
+
+encoding_rs = "0.8.35"
+
+[patch.crates-io]
+iced.git = "https://github.com/iced-rs/iced.git"
+iced_core.git = "https://github.com/iced-rs/iced.git"
+iced_widget.git = "https://github.com/iced-rs/iced.git"
+
+# For testing new bleeding edge iced features
+#iced.path = "../../external/iced"
+#iced_core.path = "../../external/iced/core"
+#iced_widget.path = "../../external/iced/widget"
