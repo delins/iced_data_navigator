@@ -23,6 +23,9 @@ use std::fmt::Debug;
 use std::cmp::{PartialEq, Ordering};
 use std::time::{Instant};
 use std::ops::Range;
+use std::sync::atomic;
+
+static CONTENT_COUNTER: atomic::AtomicU64 = atomic::AtomicU64::new(0);
 
 /// A widget for viewing and interacting with binary data of virtually any size.
 pub struct HexViewer<'a, Message, Theme>
@@ -738,13 +741,13 @@ where
         let viewport = self.create_viewport_from_scroll_offset(&layout, scroll_offset);
 
         if viewport != self.content.viewport
-            && Some(viewport) != state.last_reported_viewport
+            && Some((viewport, self.content.id)) != state.last_reported_viewport
             && let Some(func) = &self.on_logical_viewport_size_changed
         {
             let message = (func)(viewport);
             shell.publish(message);
             shell.request_redraw();
-            state.last_reported_viewport = Some(viewport);
+            state.last_reported_viewport = Some((viewport, self.content.id));
         }
 
         layout
@@ -761,12 +764,12 @@ where
     {
         if let Some(on_scrolled) = &self.on_scrolled
             && viewport != self.content.viewport
-            && Some(viewport) != state.last_reported_viewport
+            && Some((viewport, self.content.id)) != state.last_reported_viewport
         {
             let message = (on_scrolled)(viewport);
             shell.publish(message);
             shell.request_redraw();
-            state.last_reported_viewport = Some(viewport);
+            state.last_reported_viewport = Some((viewport, self.content.id));
         };
     }
 
@@ -1309,6 +1312,7 @@ pub struct Content {
     source_size: i64,
     data: Vec<u8>,
     viewport: Viewport,
+    id: u64,
 }
 
 impl Default for Content {
@@ -1327,6 +1331,7 @@ impl Content {
             source_size,
             data: vec![],
             viewport: Viewport::default(),
+            id: CONTENT_COUNTER.fetch_add(1, atomic::Ordering::SeqCst)
         }
     }
 
@@ -1461,8 +1466,8 @@ where
     scroll_area_state: ScrollAreaState,
     /// The last reported selection.
     last_reported_selection: Option<Selection>,
-    /// The last reported viewport.
-    last_reported_viewport: Option<Viewport>,
+    /// The last reported viewport, and the last reported-to Content.
+    last_reported_viewport: Option<(Viewport, u64)>,
     /// Whether we're making a selection by left click + dragging the mouse.
     dragging: bool,
     /// Absolute start index for a current or potential selection.
